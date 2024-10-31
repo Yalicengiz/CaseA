@@ -1,0 +1,33 @@
+pipeline {
+    agent {
+        kubernetes {
+            label 'jenkins-agent'
+            defaultContainer 'jnlp'
+        }
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo "Building the application..."'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                // RabbitMQ Network Policy
+                sh 'kubectl apply -f rabbitmq-network-policy.yaml'
+                // MongoDB Network Policy
+                sh 'kubectl apply -f mongodb-network-policy.yaml'
+                // Redis Network Policy
+                sh 'kubectl apply -f redis-network-policy.yaml'
+
+                // Deploy RabbitMQ
+                sh 'helm install rabbitmq bitnami/rabbitmq --set auth.username=admin --set auth.password=password'
+                // Deploy MongoDB
+                sh 'helm install mongodb bitnami/mongodb --set auth.username=admin --set auth.password=password'
+                // Deploy Redis
+                sh 'helm install redis bitnami/redis --set auth.password=password'
+            }
+        }
+    }
+}
+
