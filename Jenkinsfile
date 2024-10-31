@@ -18,16 +18,22 @@ pipeline {
         }
         stage('Deploy') {
             steps {
+                sh 'echo "Applying RabbitMQ Deployment..."'
+                sh 'kubectl apply -f k8s-deployments/rabbitmq-deployment.yaml'
                 sh 'echo "Applying RabbitMQ Network Policy..."'
                 sh 'kubectl apply -f k8s-network-policies/rabbitmq-network-policy.yaml'
                 sh 'echo "Installing RabbitMQ..."'
                 sh 'helm install rabbitmq bitnami/rabbitmq --set auth.username=admin --set auth.password=password'
                 
+                sh 'echo "Applying MongoDB Deployment..."'
+                sh 'kubectl apply -f k8s-deployments/mongodb-deployment.yaml'
                 sh 'echo "Applying MongoDB Network Policy..."'
                 sh 'kubectl apply -f k8s-network-policies/mongodb-network-policy.yaml'
                 sh 'echo "Installing MongoDB..."'
                 sh 'helm install mongodb bitnami/mongodb --set auth.rootPassword=password --set auth.username=admin --set auth.password=password'
                 
+                sh 'echo "Applying Redis Deployment..."'
+                sh 'kubectl apply -f k8s-deployments/redis-deployment.yaml'
                 sh 'echo "Applying Redis Network Policy..."'
                 sh 'kubectl apply -f k8s-network-policies/redis-network-policy.yaml'
                 sh 'echo "Installing Redis..."'
